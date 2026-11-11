@@ -164,10 +164,6 @@ class SerialManager {
 
 class ArcadeApp {
   constructor() {
-    // Instantiate SerialManager directly inside the class instance so it's never undefined
-    this.serialManager = new SerialManager();
-    window.serialManager = this.serialManager; // Sync globally just in case
-
     this.selectedGame = null;
     this.currentScore = 0;
     this.highScores = {
@@ -290,7 +286,7 @@ class ArcadeApp {
         if (window.soundEngine) window.soundEngine.click();
         try {
           this.logTerminal('Requesting USB Serial Port (9600 Baud)...');
-          await this.serialManager.connect();
+          await window.serialManager.connect();
         } catch (err) {
           this.logTerminal(`Connection error: ${err.message}`, 'warn');
         }
@@ -300,7 +296,7 @@ class ArcadeApp {
     if (this.btnDisconnect) {
       this.btnDisconnect.addEventListener('click', async () => {
         if (window.soundEngine) window.soundEngine.click();
-        await this.serialManager.disconnect();
+        await window.serialManager.disconnect();
       });
     }
 
@@ -314,8 +310,8 @@ class ArcadeApp {
     if (this.btnBackToMenu) {
       this.btnBackToMenu.addEventListener('click', () => {
         if (window.soundEngine) window.soundEngine.click();
-        if (this.serialManager.isConnected) {
-          this.serialManager.sendCommand('BACK');
+        if (window.serialManager && window.serialManager.isConnected) {
+          window.serialManager.sendCommand('BACK');
         }
         this.showMenuScreen();
       });
@@ -328,10 +324,10 @@ class ArcadeApp {
           this.logTerminal('Choose a game card first.', 'warn');
           return;
         }
-        if (this.serialManager.isConnected) {
+        if (window.serialManager && window.serialManager.isConnected) {
           this.activeState.textContent = 'STARTING…';
           this.logTerminal(`Sending START:${this.selectedGame} to Arduino…`);
-          const sent = await this.serialManager.sendCommand(`START:${this.selectedGame}`);
+          const sent = await window.serialManager.sendCommand(`START:${this.selectedGame}`);
           if (sent) this.logTerminal('Start command sent. Waiting for Arduino game status…', 'in');
           else {
             this.activeState.textContent = 'START FAILED';
@@ -346,11 +342,11 @@ class ArcadeApp {
     if (this.btnActionPause) {
       this.btnActionPause.addEventListener('click', () => {
         if (window.soundEngine) window.soundEngine.click();
-        if (this.serialManager.isConnected) {
+        if (window.serialManager && window.serialManager.isConnected) {
           if (this.activeState.textContent === 'PAUSED') {
-            this.serialManager.sendCommand('RESUME');
+            window.serialManager.sendCommand('RESUME');
           } else {
-            this.serialManager.sendCommand('PAUSE');
+            window.serialManager.sendCommand('PAUSE');
           }
         }
       });
@@ -359,8 +355,8 @@ class ArcadeApp {
     if (this.btnActionRestart) {
       this.btnActionRestart.addEventListener('click', () => {
         if (window.soundEngine) window.soundEngine.select();
-        if (this.serialManager.isConnected) {
-          this.serialManager.sendCommand('RESTART');
+        if (window.serialManager && window.serialManager.isConnected) {
+          window.serialManager.sendCommand('RESTART');
         } else {
           this.startSimulatedGame();
         }
@@ -369,7 +365,11 @@ class ArcadeApp {
   }
 
   bindSerialEvents() {
-    this.serialManager.onStatusChange = (connected, message) => {
+    if (!window.serialManager) {
+      window.serialManager = new SerialManager();
+    }
+
+    window.serialManager.onStatusChange = (connected, message) => {
       if (connected) {
         if (this.statusDot) this.statusDot.classList.add('connected');
         if (this.statusText) this.statusText.textContent = 'Arduino Connected (9600 Baud)';
@@ -386,7 +386,7 @@ class ArcadeApp {
       }
     };
 
-    this.serialManager.onTelemetry = (key, val) => {
+    window.serialManager.onTelemetry = (key, val) => {
       if (key === 'STATE') {
         if (this.activeState) this.activeState.textContent = val;
         if (window.soundEngine) {
@@ -417,11 +417,11 @@ class ArcadeApp {
       }
     };
 
-    this.serialManager.onFrame = (frameStr) => {
+    window.serialManager.onFrame = (frameStr) => {
       this.renderMatrixFrame(frameStr);
     };
 
-    this.serialManager.onMessage = (rawLine) => {
+    window.serialManager.onMessage = (rawLine) => {
       if (!rawLine.startsWith('FRAME:')) {
         console.log('Serial <<', rawLine);
       }
@@ -446,7 +446,7 @@ class ArcadeApp {
     this.logTerminal(`Selected game: ${details.title}`);
 
     this.stopSimulator();
-    if (this.serialManager.isConnected) {
+    if (window.serialManager && window.serialManager.isConnected) {
       if (this.activeState) this.activeState.textContent = 'READY — PRESS START';
       this.logTerminal(`Game selected: ${gameKey}. Press START to send it to the Arduino.`);
     } else {
@@ -493,7 +493,8 @@ class ArcadeApp {
   }
 }
 
-// Initialize ArcadeApp safely when DOM is ready
+// Safely initialize SerialManager first, then ArcadeApp when DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
+  window.serialManager = new SerialManager();
   window.app = new ArcadeApp();
 });
