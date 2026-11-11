@@ -17,8 +17,66 @@ const GAME_DETAILS = {
   },
   BOSS: {
     title: 'BOSS BATTLE',
-    instructions: 'Epic mothership showdown! Dodge falling missile barrages and retaliate with your counter-cannons by pressing S5 (BACK)!'
+    instructions: 'Epic mothership showdown! Dodge falling missile barrages and retaliate with your counter-cannons by pressing S5 (BACK/SHOOT)!'
   }
+};
+
+const GAME_GUIDES = {
+  TURBO: `OBJECTIVE:
+Avoid obstacles.
+
+CONTROLS:
+S3 = LEFT
+S1 = RIGHT
+
+SCORE:
++10 per obstacle avoided.`,
+
+  MONSTER: `OBJECTIVE:
+Reach the sanctuary.
+
+CONTROLS:
+S4 = UP
+S1 = RIGHT
+S2 = DOWN
+S3 = LEFT
+
+AVOID:
+The chasing monster.`,
+
+  TREASURE: `OBJECTIVE:
+Find the hidden treasure.
+
+CONTROLS:
+S4 = UP
+S1 = RIGHT
+S2 = DOWN
+S3 = LEFT
+
+WARNING:
+Avoid traps.`,
+
+  REACTION: `OBJECTIVE:
+Press the correct button quickly.
+
+ARROWS:
+↑ = S4
+→ = S1
+↓ = S2
+← = S3
+
+React as fast as possible!`,
+
+  BOSS: `OBJECTIVE:
+Destroy the boss.
+
+CONTROLS:
+S3 = LEFT
+S1 = RIGHT
+S5 = SHOOT/BACK
+
+AVOID:
+Laser barrages.`
 };
 
 /**
@@ -33,7 +91,6 @@ class SerialManager {
     this.inputStream = null;
     this.readLoopPromise = null;
 
-    // Callbacks attached by ArcadeApp
     this.onStatusChange = null;
     this.onTelemetry = null;
     this.onFrame = null;
@@ -175,7 +232,6 @@ class ArcadeApp {
     };
     this.loadHighScores();
 
-    // DOM Elements
     this.screenMenu = document.getElementById('screenMenu');
     this.screenGame = document.getElementById('screenGame');
     this.btnConnect = document.getElementById('btnConnect');
@@ -440,6 +496,12 @@ class ArcadeApp {
     if (this.activeBest) this.activeBest.textContent = this.highScores[gameKey] || 0;
     if (this.activeState) this.activeState.textContent = 'READY';
 
+    // NEW: Update the dynamic game guide box
+    const guide = document.getElementById('guideText');
+    if (guide) {
+      guide.innerText = GAME_GUIDES[gameKey] || 'Select a game to see instructions.';
+    }
+
     if (this.screenMenu) this.screenMenu.classList.remove('active');
     if (this.screenGame) this.screenGame.classList.add('active');
 
@@ -461,6 +523,12 @@ class ArcadeApp {
     if (this.screenMenu) this.screenMenu.classList.add('active');
     this.stopSimulator();
     this.updateCardHighScores();
+    
+    // Reset guide text when returning to menu
+    const guide = document.getElementById('guideText');
+    if (guide) {
+      guide.innerText = 'Select a game to see instructions.';
+    }
   }
 
   startSimulatedGame() {
@@ -493,7 +561,6 @@ class ArcadeApp {
   }
 }
 
-// Safely initialize SerialManager first, then ArcadeApp when DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
   window.serialManager = new SerialManager();
   window.app = new ArcadeApp();
