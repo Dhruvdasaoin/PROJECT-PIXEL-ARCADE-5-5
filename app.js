@@ -13,7 +13,7 @@ const GAME_DETAILS = {
   },
   REACTION: {
     title: 'REACTION RUSH',
-    instructions: 'Wait for the sudden arrow prompt and press the matching directional button (S1=UP, S2=RIGHT, S3=DOWN, S4=LEFT) with lightning reflexes!'
+    instructions: 'Match the arrow quickly! S4 = UP, S1 = RIGHT, S2 = DOWN, S3 = LEFT.'
   },
   BOSS: {
     title: 'BOSS BATTLE',
