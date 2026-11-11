@@ -20,17 +20,12 @@
       </div>
 
       <div class="header-controls">
-        <!-- Status Indicator -->
         <div class="status-pill">
           <span class="status-dot" id="statusDot"></span>
           <span id="statusText">Arduino Disconnected</span>
         </div>
-
-        <!-- Connection Button -->
         <button id="btnConnect" class="arcade-btn"><span>⚡ CONNECT USB</span></button>
         <button id="btnDisconnect" class="arcade-btn" style="display:none;"><span>❌ DISCONNECT USB</span></button>
-
-        <!-- Sound Toggle -->
         <button id="btnSound" class="icon-btn" title="Toggle Sound">🔊</button>
       </div>
     </header>
@@ -44,10 +39,7 @@
 
       <div class="game-grid">
         <article class="game-card" data-game="TURBO">
-          <div class="card-header">
-            <div class="game-icon">🕹️</div>
-            <span class="badge-tag">High Speed</span>
-          </div>
+          <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">High Speed</span></div>
           <h3 class="card-title">TURBO RUSH</h3>
           <p class="card-desc">Dodge oncoming traffic obstacles at escalating speed. Swerve left and right on Row 4 to survive!</p>
           <div class="card-footer">
@@ -56,22 +48,16 @@
           </div>
         </article>
         <article class="game-card" data-game="BLOCKS">
-          <div class="card-header">
-            <div class="game-icon">🕹️</div>
-            <span class="badge-tag">Stacker</span>
-          </div>
+          <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">Stacker</span></div>
           <h3 class="card-title">PIXEL BLOCKS</h3>
-          <p class="card-desc">Catch falling pixels with your paddle at the bottom before they slip away. Speed accelerates with each block caught!</p>
+          <p class="card-desc">Catch falling pixels with your paddle at the bottom before they slip away. Speed accelerates!</p>
           <div class="card-footer">
             <span class="high-score-tag">BEST: <span id="cardBest_BLOCKS">0</span></span>
             <button class="arcade-btn btn-play" data-game="BLOCKS">PLAY</button>
           </div>
         </article>
         <article class="game-card" data-game="MONSTER">
-          <div class="card-header">
-            <div class="game-icon">🕹️</div>
-            <span class="badge-tag">Survival</span>
-          </div>
+          <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">Survival</span></div>
           <h3 class="card-title">MONSTER ESCAPE</h3>
           <p class="card-desc">Outsmart and evade the relentless chasing monster across the 5x5 matrix to reach the sanctuary at (4,4)!</p>
           <div class="card-footer">
@@ -80,10 +66,7 @@
           </div>
         </article>
         <article class="game-card" data-game="TREASURE">
-          <div class="card-header">
-            <div class="game-icon">🕹️</div>
-            <span class="badge-tag">Radar Quest</span>
-          </div>
+          <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">Radar Quest</span></div>
           <h3 class="card-title">TREASURE HUNT</h3>
           <p class="card-desc">Follow the live radar distance readout on your LCD screen to pinpoint the hidden chest while avoiding spike traps!</p>
           <div class="card-footer">
@@ -92,10 +75,7 @@
           </div>
         </article>
         <article class="game-card" data-game="REACTION">
-          <div class="card-header">
-            <div class="game-icon">🕹️</div>
-            <span class="badge-tag">Reflex Test</span>
-          </div>
+          <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">Reflex Test</span></div>
           <h3 class="card-title">REACTION RUSH</h3>
           <p class="card-desc">Wait for the sudden arrow signal and hit the matching direction immediately. Measures your reaction time in ms!</p>
           <div class="card-footer">
@@ -104,10 +84,7 @@
           </div>
         </article>
         <article class="game-card" data-game="NINJA">
-          <div class="card-header">
-            <div class="game-icon">🕹️</div>
-            <span class="badge-tag">Infiltration</span>
-          </div>
+          <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">Infiltration</span></div>
           <h3 class="card-title">NINJA ESCAPE</h3>
           <p class="card-desc">Infiltrate enemy territory! Time your dash to cross pulsing laser barrier rows without getting detected.</p>
           <div class="card-footer">
@@ -116,10 +93,7 @@
           </div>
         </article>
         <article class="game-card" data-game="DUNGEON">
-          <div class="card-header">
-            <div class="game-icon">🕹️</div>
-            <span class="badge-tag">RPG Crawler</span>
-          </div>
+          <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">RPG Crawler</span></div>
           <h3 class="card-title">DUNGEON QUEST</h3>
           <p class="card-desc">Locate the dungeon key, strike down dungeon minions using S5 (BACK), and unlock the exit portal!</p>
           <div class="card-footer">
@@ -128,10 +102,7 @@
           </div>
         </article>
         <article class="game-card" data-game="BOX">
-          <div class="card-header">
-            <div class="game-icon">🕹️</div>
-            <span class="badge-tag">Brain Puzzle</span>
-          </div>
+          <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">Brain Puzzle</span></div>
           <h3 class="card-title">BOX MASTER</h3>
           <p class="card-desc">Classic Sokoban brain-teaser. Push the solid crate onto the flashing target switch without pinning it against walls!</p>
           <div class="card-footer">
@@ -140,10 +111,7 @@
           </div>
         </article>
         <article class="game-card" data-game="BOSS">
-          <div class="card-header">
-            <div class="game-icon">🕹️</div>
-            <span class="badge-tag">Epic Climax</span>
-          </div>
+          <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">Epic Climax</span></div>
           <h3 class="card-title">BOSS BATTLE</h3>
           <p class="card-desc">Face off against the alien mothership boss. Dodge missile volleys and fire your counter-cannons using S5 (BACK) to win!</p>
           <div class="card-footer">
@@ -164,7 +132,6 @@
             <button id="btnBackToMenu" class="arcade-btn">← MENU</button>
           </div>
 
-          <!-- Scoreboard -->
           <div class="scores-bar">
             <div class="score-box highlight">
               <div class="label">CURRENT SCORE</div>
@@ -180,13 +147,17 @@
             </div>
           </div>
 
-          <!-- Instructions -->
           <div class="instructions-block">
             <h3>OBJECTIVE & INSTRUCTIONS</h3>
             <p id="activeInstructions">Use directional buttons to control movement.</p>
           </div>
 
-          <!-- Shield Hardware Buttons Mapping -->
+          <!-- NEW: DYNAMIC GAME GUIDE BOX -->
+          <div class="guide-box">
+            <h3>🎮 QUICK GAME GUIDE</h3>
+            <div id="guideText" style="white-space: pre-line;">Select a game to see instructions.</div>
+          </div>
+
           <div class="controls-map">
             <h4>PHYSICAL BUTTON CONTROLS (MOONUINO SHIELD)</h4>
             <div class="button-tags-grid">
@@ -194,12 +165,11 @@
               <div class="button-tag"><span class="key">S2 (A1):</span> DOWN</div>
               <div class="button-tag"><span class="key">S3 (A2):</span> LEFT</div>
               <div class="button-tag"><span class="key">S4 (A3):</span> UP</div>
-              <div class="button-tag"><span class="key">S5 (D12):</span> BACK</div>
+              <div class="button-tag"><span class="key">S5 (D12):</span> BACK / SHOOT</div>
               <div class="button-tag"><span class="key">S6 (D13):</span> PAUSE</div>
             </div>
           </div>
 
-          <!-- Game Action Buttons -->
           <div class="action-bar">
             <button id="btnActionStart" class="arcade-btn">▶ START</button>
             <button id="btnActionPause" class="arcade-btn btn-yellow">⏸ PAUSE</button>
@@ -211,12 +181,9 @@
         <div class="virtual-matrix-card">
           <div class="matrix-header">LIVE 5×5 HARDWARE MIRROR</div>
           <div class="matrix-bezel">
-            <div class="matrix-grid" id="matrixGrid">
-              <!-- 25 LEDs generated via JS -->
-            </div>
+            <div class="matrix-grid" id="matrixGrid"></div>
           </div>
 
-          <!-- Virtual D-Pad for Browser Testing -->
           <div class="virtual-controller">
             <div class="controller-title">VIRTUAL SHIELD CONTROLS</div>
             <div class="dpad-container">
