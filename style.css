@@ -614,3 +614,27 @@ body {
 .terminal-logs p.in { color: var(--neon-cyan); }
 .terminal-logs p.out { color: var(--neon-green); }
 .terminal-logs p.warn { color: var(--neon-yellow); }
+/* --- DYNAMIC GAME GUIDE BOX --- */
+.guide-box {
+  margin-top: 20px;
+  padding: 15px;
+  border: 2px solid #00ffff;
+  border-radius: 10px;
+  background: rgba(0, 255, 255, 0.05);
+  color: #ffffff;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+}
+
+.guide-box h3 {
+  color: #00ffff;
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+  padding-bottom: 5px;
+}
