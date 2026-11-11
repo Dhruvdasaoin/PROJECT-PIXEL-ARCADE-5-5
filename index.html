@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIXEL ARCADE 5×5 | Arduino Retro Matrix Arcade</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕹️</text></svg>">
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="ambient-glow"></div>
+
+  <div class="app-container">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="logo-wrapper">
+        <div class="logo-badge">5×5</div>
+        <div class="app-title">PIXEL ARCADE</div>
+      </div>
+
+      <div class="header-controls">
+        <!-- Status Indicator -->
+        <div class="status-pill">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Arduino Disconnected</span>
+        </div>
+
+        <!-- Connection Button -->
+        <button id="btnConnect" class="arcade-btn"><span>⚡ CONNECT USB</span></button>
+        <button id="btnDisconnect" class="arcade-btn" style="display:none;"><span>❌ DISCONNECT USB</span></button>
+
+        <!-- Sound Toggle -->
+        <button id="btnSound" class="icon-btn" title="Toggle Sound">🔊</button>
+      </div>
+    </header>
+
+    <!-- Main Arcade Menu Screen -->
+    <main id="screenMenu" class="screen active">
+      <div class="menu-intro">
+        <h2>SELECT YOUR GAME</h2>
+        <p>Choose an arcade cartridge below. Play using the 6 physical buttons on your MOONUINO shield or the on-screen controls!</p>
+      </div>
+
+      <div class="game-grid">
+        <article class="game-card" data-game="TURBO">
+          <div class="card-header">
+            <div class="game-icon">🕹️</div>
+            <span class="badge-tag">High Speed</span>
+          </div>
+          <h3 class="card-title">TURBO RUSH</h3>
+          <p class="card-desc">Dodge oncoming traffic obstacles at escalating speed. Swerve left and right on Row 4 to survive!</p>
+          <div class="card-footer">
+            <span class="high-score-tag">BEST: <span id="cardBest_TURBO">0</span></span>
+            <button class="arcade-btn btn-play" data-game="TURBO">PLAY</button>
+          </div>
+        </article>
+        <article class="game-card" data-game="BLOCKS">
+          <div class="card-header">
+            <div class="game-icon">🕹️</div>
+            <span class="badge-tag">Stacker</span>
+          </div>
+          <h3 class="card-title">PIXEL BLOCKS</h3>
+          <p class="card-desc">Catch falling pixels with your paddle at the bottom before they slip away. Speed accelerates with each block caught!</p>
+          <div class="card-footer">
+            <span class="high-score-tag">BEST: <span id="cardBest_BLOCKS">0</span></span>
+            <button class="arcade-btn btn-play" data-game="BLOCKS">PLAY</button>
+          </div>
+        </article>
+        <article class="game-card" data-game="MONSTER">
+          <div class="card-header">
+            <div class="game-icon">🕹️</div>
+            <span class="badge-tag">Survival</span>
+          </div>
+          <h3 class="card-title">MONSTER ESCAPE</h3>
+          <p class="card-desc">Outsmart and evade the relentless chasing monster across the 5x5 matrix to reach the sanctuary at (4,4)!</p>
+          <div class="card-footer">
+            <span class="high-score-tag">BEST: <span id="cardBest_MONSTER">0</span></span>
+            <button class="arcade-btn btn-play" data-game="MONSTER">PLAY</button>
+          </div>
+        </article>
+        <article class="game-card" data-game="TREASURE">
+          <div class="card-header">
+            <div class="game-icon">🕹️</div>
+            <span class="badge-tag">Radar Quest</span>
+          </div>
+          <h3 class="card-title">TREASURE HUNT</h3>
+          <p class="card-desc">Follow the live radar distance readout on your LCD screen to pinpoint the hidden chest while avoiding spike traps!</p>
+          <div class="card-footer">
+            <span class="high-score-tag">BEST: <span id="cardBest_TREASURE">0</span></span>
+            <button class="arcade-btn btn-play" data-game="TREASURE">PLAY</button>
+          </div>
+        </article>
+        <article class="game-card" data-game="REACTION">
+          <div class="card-header">
+            <div class="game-icon">🕹️</div>
+            <span class="badge-tag">Reflex Test</span>
+          </div>
+          <h3 class="card-title">REACTION RUSH</h3>
+          <p class="card-desc">Wait for the sudden arrow signal and hit the matching direction immediately. Measures your reaction time in ms!</p>
+          <div class="card-footer">
+            <span class="high-score-tag">BEST: <span id="cardBest_REACTION">0</span></span>
+            <button class="arcade-btn btn-play" data-game="REACTION">PLAY</button>
+          </div>
+        </article>
+        <article class="game-card" data-game="NINJA">
+          <div class="card-header">
+            <div class="game-icon">🕹️</div>
+            <span class="badge-tag">Infiltration</span>
+          </div>
+          <h3 class="card-title">NINJA ESCAPE</h3>
+          <p class="card-desc">Infiltrate enemy territory! Time your dash to cross pulsing laser barrier rows without getting detected.</p>
+          <div class="card-footer">
+            <span class="high-score-tag">BEST: <span id="cardBest_NINJA">0</span></span>
+            <button class="arcade-btn btn-play" data-game="NINJA">PLAY</button>
+          </div>
+        </article>
+        <article class="game-card" data-game="DUNGEON">
+          <div class="card-header">
+            <div class="game-icon">🕹️</div>
+            <span class="badge-tag">RPG Crawler</span>
+          </div>
+          <h3 class="card-title">DUNGEON QUEST</h3>
+          <p class="card-desc">Locate the dungeon key, strike down dungeon minions using S5 (SELECT), and unlock the exit portal!</p>
+          <div class="card-footer">
+            <span class="high-score-tag">BEST: <span id="cardBest_DUNGEON">0</span></span>
+            <button class="arcade-btn btn-play" data-game="DUNGEON">PLAY</button>
+          </div>
+        </article>
+        <article class="game-card" data-game="BOX">
+          <div class="card-header">
+            <div class="game-icon">🕹️</div>
+            <span class="badge-tag">Brain Puzzle</span>
+          </div>
+          <h3 class="card-title">BOX MASTER</h3>
+          <p class="card-desc">Classic Sokoban brain-teaser. Push the solid crate onto the flashing target switch without pinning it against walls!</p>
+          <div class="card-footer">
+            <span class="high-score-tag">BEST: <span id="cardBest_BOX">0</span></span>
+            <button class="arcade-btn btn-play" data-game="BOX">PLAY</button>
+          </div>
+        </article>
+        <article class="game-card" data-game="BOSS">
+          <div class="card-header">
+            <div class="game-icon">🕹️</div>
+            <span class="badge-tag">Epic Climax</span>
+          </div>
+          <h3 class="card-title">BOSS BATTLE</h3>
+          <p class="card-desc">Face off against the alien mothership boss. Dodge missile volleys and fire your counter-cannons using S5 to win!</p>
+          <div class="card-footer">
+            <span class="high-score-tag">BEST: <span id="cardBest_BOSS">0</span></span>
+            <button class="arcade-btn btn-play" data-game="BOSS">PLAY</button>
+          </div>
+        </article>
+      </div>
+    </main>
+
+    <!-- Active Game Screen -->
+    <main id="screenGame" class="screen">
+      <div class="game-view-layout">
+        <!-- Left: Game Info & Controls -->
+        <div class="game-info-panel">
+          <div class="game-title-row">
+            <h1 id="activeGameTitle">SNAKE</h1>
+            <button id="btnBackToMenu" class="arcade-btn">← MENU</button>
+          </div>
+
+          <!-- Scoreboard -->
+          <div class="scores-bar">
+            <div class="score-box highlight">
+              <div class="label">CURRENT SCORE</div>
+              <div class="value" id="activeScore">0</div>
+            </div>
+            <div class="score-box">
+              <div class="label">HIGH SCORE</div>
+              <div class="value" id="activeBest">0</div>
+            </div>
+            <div class="score-box">
+              <div class="label">STATE</div>
+              <div class="value" id="activeState" style="font-size:1.2rem; color:var(--neon-cyan);">READY</div>
+            </div>
+          </div>
+
+          <!-- Instructions -->
+          <div class="instructions-block">
+            <h3>OBJECTIVE & INSTRUCTIONS</h3>
+            <p id="activeInstructions">Use directional buttons to control movement.</p>
+          </div>
+
+          <!-- Shield Hardware Buttons Mapping -->
+          <div class="controls-map">
+            <h4>PHYSICAL BUTTON CONTROLS (MOONUINO SHIELD)</h4>
+            <div class="button-tags-grid">
+              <div class="button-tag"><span class="key">S1 (A0):</span> UP</div>
+              <div class="button-tag"><span class="key">S2 (A1):</span> RIGHT</div>
+              <div class="button-tag"><span class="key">S3 (A2):</span> DOWN</div>
+              <div class="button-tag"><span class="key">S4 (A3):</span> LEFT</div>
+              <div class="button-tag"><span class="key">S5 (D12):</span> SELECT / ACTION</div>
+              <div class="button-tag"><span class="key">S6 (D13):</span> BACK / PAUSE</div>
+            </div>
+          </div>
+
+          <!-- Game Action Buttons -->
+          <div class="action-bar">
+            <button id="btnActionStart" class="arcade-btn">▶ START</button>
+            <button id="btnActionPause" class="arcade-btn btn-yellow">⏸ PAUSE</button>
+            <button id="btnActionRestart" class="arcade-btn btn-magenta">🔄 RESTART</button>
+          </div>
+        </div>
+
+        <!-- Right: 5x5 Virtual LED Matrix Mirror -->
+        <div class="virtual-matrix-card">
+          <div class="matrix-header">LIVE 5×5 HARDWARE MIRROR</div>
+          <div class="matrix-bezel">
+            <div class="matrix-grid" id="matrixGrid">
+              <!-- 25 LEDs generated via JS -->
+            </div>
+          </div>
+
+          <!-- Virtual D-Pad for Browser Testing -->
+          <div class="virtual-controller">
+            <div class="controller-title">VIRTUAL SHIELD CONTROLS</div>
+            <div class="dpad-container">
+              <div></div>
+              <button class="dpad-btn" id="vbtnUp" title="S1: UP">▲</button>
+              <div></div>
+              <button class="dpad-btn" id="vbtnLeft" title="S4: LEFT">◀</button>
+              <div style="display:flex;align-items:center;justify-content:center;color:#445;">•</div>
+              <button class="dpad-btn" id="vbtnRight" title="S2: RIGHT">▶</button>
+              <div></div>
+              <button class="dpad-btn" id="vbtnDown" title="S3: DOWN">▼</button>
+              <div></div>
+            </div>
+            <div class="action-btns-row">
+              <button class="action-pill-btn" id="vbtnSelect">S5: SELECT</button>
+              <button class="action-pill-btn" id="vbtnBack">S6: PAUSE/BACK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Serial & Telemetry Terminal Logs -->
+    <div class="terminal-card">
+      <div class="terminal-header">
+        <span>SERIAL LOG & TELEMETRY STREAM</span>
+        <span id="telemetryState">9600 BAUD</span>
+      </div>
+      <div class="terminal-logs" id="terminalLogs">
+        <p class="warn">> Welcome to PIXEL ARCADE 5×5. Connect Arduino Uno via USB to play!</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="audio.js"></script>
+  <script src="serial.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
