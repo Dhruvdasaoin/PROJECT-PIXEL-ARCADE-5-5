@@ -47,6 +47,17 @@
             <button class="arcade-btn btn-play" data-game="TURBO">PLAY</button>
           </div>
         </article>
+        
+        <article class="game-card" data-game="BLOCKS">
+          <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">Stacker</span></div>
+          <h3 class="card-title">PIXEL BLOCKS</h3>
+          <p class="card-desc">Catch falling pixels with your paddle at the bottom before they slip away. Speed accelerates!</p>
+          <div class="card-footer">
+            <span class="high-score-tag">BEST: <span id="cardBest_BLOCKS">0</span></span>
+            <button class="arcade-btn btn-play" data-game="BLOCKS">PLAY</button>
+          </div>
+        </article>
+
         <article class="game-card" data-game="MONSTER">
           <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">Survival</span></div>
           <h3 class="card-title">MONSTER ESCAPE</h3>
@@ -56,6 +67,7 @@
             <button class="arcade-btn btn-play" data-game="MONSTER">PLAY</button>
           </div>
         </article>
+
         <article class="game-card" data-game="TREASURE">
           <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">Radar Quest</span></div>
           <h3 class="card-title">TREASURE HUNT</h3>
@@ -65,6 +77,7 @@
             <button class="arcade-btn btn-play" data-game="TREASURE">PLAY</button>
           </div>
         </article>
+
         <article class="game-card" data-game="REACTION">
           <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">Reflex Test</span></div>
           <h3 class="card-title">REACTION RUSH</h3>
@@ -74,6 +87,37 @@
             <button class="arcade-btn btn-play" data-game="REACTION">PLAY</button>
           </div>
         </article>
+
+        <article class="game-card" data-game="NINJA">
+          <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">Infiltration</span></div>
+          <h3 class="card-title">NINJA ESCAPE</h3>
+          <p class="card-desc">Infiltrate enemy territory! Time your dash to cross pulsing laser barrier rows without getting detected.</p>
+          <div class="card-footer">
+            <span class="high-score-tag">BEST: <span id="cardBest_NINJA">0</span></span>
+            <button class="arcade-btn btn-play" data-game="NINJA">PLAY</button>
+          </div>
+        </article>
+
+        <article class="game-card" data-game="DUNGEON">
+          <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">RPG Crawler</span></div>
+          <h3 class="card-title">DUNGEON QUEST</h3>
+          <p class="card-desc">Locate the dungeon key, strike down dungeon minions using S5, and unlock the exit portal!</p>
+          <div class="card-footer">
+            <span class="high-score-tag">BEST: <span id="cardBest_DUNGEON">0</span></span>
+            <button class="arcade-btn btn-play" data-game="DUNGEON">PLAY</button>
+          </div>
+        </article>
+
+        <article class="game-card" data-game="BOX">
+          <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">Brain Puzzle</span></div>
+          <h3 class="card-title">BOX MASTER</h3>
+          <p class="card-desc">Classic Sokoban brain-teaser. Push the solid crate onto the flashing target switch without pinning it against walls!</p>
+          <div class="card-footer">
+            <span class="high-score-tag">BEST: <span id="cardBest_BOX">0</span></span>
+            <button class="arcade-btn btn-play" data-game="BOX">PLAY</button>
+          </div>
+        </article>
+
         <article class="game-card" data-game="BOSS">
           <div class="card-header"><div class="game-icon">🕹️</div><span class="badge-tag">Epic Climax</span></div>
           <h3 class="card-title">BOSS BATTLE</h3>
@@ -116,7 +160,7 @@
             <p id="activeInstructions">Use directional buttons to control movement.</p>
           </div>
 
-          <!-- NEW: CLEAN GAME GUIDE BOX -->
+          <!-- DYNAMIC GAME GUIDE BOX -->
           <div id="gameGuide" class="guideBox">Select a game to view controls.</div>
 
           <div class="controls-map">
@@ -126,7 +170,7 @@
               <div class="button-tag"><span class="key">S2 (A1):</span> DOWN</div>
               <div class="button-tag"><span class="key">S3 (A2):</span> LEFT</div>
               <div class="button-tag"><span class="key">S4 (A3):</span> UP</div>
-              <div class="button-tag"><span class="key">S5 (D12):</span> SHOOT / BACK</div>
+              <div class="button-tag"><span class="key">S5 (D12):</span> SHOOT / ACTION</div>
               <div class="button-tag"><span class="key">S6 (D13):</span> PAUSE</div>
             </div>
           </div>
@@ -162,6 +206,6 @@
 
   <script src="audio.js"></script>
   <script src="serial.js"></script>
-  <script src="app.js?v=3.0"></script>
+  <script src="app.js?v=4.0"></script>
 </body>
 </html>
