@@ -17,76 +17,56 @@ const GAME_DETAILS = {
   },
   BOSS: {
     title: 'BOSS BATTLE',
-    instructions: 'Epic mothership showdown! Dodge falling missile barrages and retaliate with your counter-cannons by pressing S5 (BACK/SHOOT)!'
+    instructions: 'Epic mothership showdown! Dodge falling missile barrages and retaliate with your counter-cannons by pressing S5 (SHOOT)!'
   }
 };
 
 const GAME_GUIDES = {
-  TURBO: `OBJECTIVE:
-Avoid obstacles.
-
-CONTROLS:
+  TURBO: `Controls:
 S3 = LEFT
 S1 = RIGHT
 
-SCORE:
-+10 per obstacle avoided.`,
+Avoid obstacles.`,
 
-  MONSTER: `OBJECTIVE:
-Reach the sanctuary.
-
-CONTROLS:
+  MONSTER: `Controls:
 S4 = UP
 S1 = RIGHT
 S2 = DOWN
 S3 = LEFT
 
-AVOID:
-The chasing monster.`,
+Reach sanctuary.`,
 
-  TREASURE: `OBJECTIVE:
-Find the hidden treasure.
-
-CONTROLS:
+  TREASURE: `Controls:
 S4 = UP
 S1 = RIGHT
 S2 = DOWN
 S3 = LEFT
 
-WARNING:
+Find treasure.
 Avoid traps.`,
 
-  REACTION: `OBJECTIVE:
-Press the correct button quickly.
+  REACTION: `Controls:
 
-ARROWS:
 ↑ = S4
 → = S1
 ↓ = S2
 ← = S3
 
-React as fast as possible!`,
+Press matching button quickly.`,
 
-  BOSS: `OBJECTIVE:
-Destroy the boss.
+  BOSS: `Controls:
 
-CONTROLS:
 S3 = LEFT
 S1 = RIGHT
-S5 = SHOOT/BACK
+S5 = FIRE
 
-AVOID:
-Laser barrages.`
+Avoid lasers.`
 };
 
-/**
- * Manages Web Serial API connections, port opening/closing, and incoming buffer line parsing.
- */
 class SerialManager {
   constructor() {
     this.port = null;
     this.reader = null;
-    this.writer = null;
     this.isConnected = false;
     this.inputStream = null;
     this.readLoopPromise = null;
@@ -101,70 +81,45 @@ class SerialManager {
     if (!('serial' in navigator)) {
       throw new Error('Web Serial API not supported in this browser. Use Google Chrome or Microsoft Edge.');
     }
-
     try {
       this.port = await navigator.serial.requestPort();
       await this.port.open({ baudRate: 9600 });
-
       this.isConnected = true;
-      if (typeof this.onStatusChange === 'function') {
-        this.onStatusChange(true, 'Connected to Arduino Uno');
-      }
-
+      if (typeof this.onStatusChange === 'function') this.onStatusChange(true, 'Connected to Arduino Uno');
       this.startReading();
     } catch (err) {
       this.isConnected = false;
-      if (typeof this.onStatusChange === 'function') {
-        this.onStatusChange(false, err.message);
-      }
+      if (typeof this.onStatusChange === 'function') this.onStatusChange(false, err.message);
       throw err;
     }
   }
 
   async disconnect() {
     try {
-      if (this.reader) {
-        await this.reader.cancel();
-        await this.readLoopPromise;
-      }
-      if (this.port) {
-        await this.port.close();
-      }
-    } catch (e) {
-      console.warn('Error during disconnect', e);
-    } finally {
-      this.port = null;
-      this.reader = null;
-      this.isConnected = false;
-      if (typeof this.onStatusChange === 'function') {
-        this.onStatusChange(false, 'Disconnected by user');
-      }
+      if (this.reader) { await this.reader.cancel(); await this.readLoopPromise; }
+      if (this.port) await this.port.close();
+    } catch (e) { console.warn('Error during disconnect', e); } 
+    finally {
+      this.port = null; this.reader = null; this.isConnected = false;
+      if (typeof this.onStatusChange === 'function') this.onStatusChange(false, 'Disconnected by user');
     }
   }
 
   async sendCommand(cmd) {
-    if (!this.port || !this.isConnected) {
-      console.warn('Cannot send command: Serial port not connected');
-      return false;
-    }
-
+    if (!this.port || !this.isConnected) return false;
     try {
       const textEncoder = new TextEncoder();
       const writer = this.port.writable.getWriter();
       await writer.write(textEncoder.encode(cmd + '\n'));
       writer.releaseLock();
       return true;
-    } catch (err) {
-      console.error('Failed to write to serial port:', err);
-      return false;
-    }
+    } catch (err) { console.error('Failed to write to serial port:', err); return false; }
   }
 
   async startReading() {
     const textDecoder = new TextDecoderStream();
     this.inputStream = this.port.readable.pipeTo(textDecoder.writable);
     this.reader = textDecoder.readable.getReader();
-
     let lineBuffer = '';
 
     this.readLoopPromise = (async () => {
@@ -172,49 +127,31 @@ class SerialManager {
         while (true) {
           const { value, done } = await this.reader.read();
           if (done) break;
-          
           lineBuffer += value;
           let lineEndIndex;
           while ((lineEndIndex = lineBuffer.indexOf('\n')) >= 0) {
             let line = lineBuffer.substring(0, lineEndIndex);
             lineBuffer = lineBuffer.substring(lineEndIndex + 1);
             line = line.trim();
-            if (line) {
-              this.handleIncomingLine(line);
-            }
+            if (line) this.handleIncomingLine(line);
           }
         }
-      } catch (error) {
-        console.error('Serial read loop error:', error);
-      } finally {
-        if (this.reader) {
-          this.reader.releaseLock();
-        }
-      }
+      } catch (error) { console.error('Serial read loop error:', error); } 
+      finally { if (this.reader) this.reader.releaseLock(); }
     })();
   }
 
   handleIncomingLine(line) {
-    if (typeof this.onMessage === 'function') {
-      this.onMessage(line);
-    }
-
+    if (typeof this.onMessage === 'function') this.onMessage(line);
     if (line.startsWith('FRAME:')) {
-      const frameData = line.substring(6);
-      if (typeof this.onFrame === 'function') {
-        this.onFrame(frameData);
-      }
+      if (typeof this.onFrame === 'function') this.onFrame(line.substring(6));
       return;
     }
-
     const separatorIndex = line.indexOf(':');
     if (separatorIndex !== -1) {
       const key = line.substring(0, separatorIndex).trim();
       const val = line.substring(separatorIndex + 1).trim();
-
-      if (typeof this.onTelemetry === 'function') {
-        this.onTelemetry(key, val);
-      }
+      if (typeof this.onTelemetry === 'function') this.onTelemetry(key, val);
     }
   }
 }
@@ -223,13 +160,7 @@ class ArcadeApp {
   constructor() {
     this.selectedGame = null;
     this.currentScore = 0;
-    this.highScores = {
-      TURBO: 0,
-      MONSTER: 0,
-      TREASURE: 0,
-      REACTION: 0,
-      BOSS: 0
-    };
+    this.highScores = { TURBO: 0, MONSTER: 0, TREASURE: 0, REACTION: 0, BOSS: 0 };
     this.loadHighScores();
 
     this.screenMenu = document.getElementById('screenMenu');
@@ -254,7 +185,6 @@ class ArcadeApp {
 
     this.matrixGrid = document.getElementById('matrixGrid');
     this.matrixCells = [];
-
     this.isSimulating = false;
     this.simFrameTimer = null;
 
@@ -267,20 +197,14 @@ class ArcadeApp {
   loadHighScores() {
     try {
       const saved = localStorage.getItem('pixel_arcade_highscores');
-      if (saved) {
-        this.highScores = Object.assign(this.highScores, JSON.parse(saved));
-      }
-    } catch (e) {
-      console.warn('Could not load high scores', e);
-    }
+      if (saved) this.highScores = Object.assign(this.highScores, JSON.parse(saved));
+    } catch (e) { console.warn('Could not load high scores', e); }
   }
 
   saveHighScore(game, score) {
     if (score > (this.highScores[game] || 0)) {
       this.highScores[game] = score;
-      try {
-        localStorage.setItem('pixel_arcade_highscores', JSON.stringify(this.highScores));
-      } catch (e) {}
+      try { localStorage.setItem('pixel_arcade_highscores', JSON.stringify(this.highScores)); } catch (e) {}
       this.updateCardHighScores();
     }
   }
@@ -311,11 +235,8 @@ class ArcadeApp {
   renderMatrixFrame(frameStr) {
     if (!frameStr || frameStr.length < 25 || this.matrixCells.length < 25) return;
     for (let i = 0; i < 25; i++) {
-      if (frameStr[i] === '1') {
-        this.matrixCells[i].classList.add('on');
-      } else {
-        this.matrixCells[i].classList.remove('on');
-      }
+      if (frameStr[i] === '1') this.matrixCells[i].classList.add('on');
+      else this.matrixCells[i].classList.remove('on');
     }
   }
 
@@ -333,7 +254,6 @@ class ArcadeApp {
       this.btnSound.addEventListener('click', () => {
         const enabled = window.soundEngine ? window.soundEngine.toggle() : false;
         this.btnSound.textContent = enabled ? '🔊' : '🔇';
-        this.logTerminal(`Audio ${enabled ? 'enabled' : 'muted'}`);
       });
     }
 
@@ -343,9 +263,7 @@ class ArcadeApp {
         try {
           this.logTerminal('Requesting USB Serial Port (9600 Baud)...');
           await window.serialManager.connect();
-        } catch (err) {
-          this.logTerminal(`Connection error: ${err.message}`, 'warn');
-        }
+        } catch (err) { this.logTerminal(`Connection error: ${err.message}`, 'warn'); }
       });
     }
 
@@ -366,9 +284,7 @@ class ArcadeApp {
     if (this.btnBackToMenu) {
       this.btnBackToMenu.addEventListener('click', () => {
         if (window.soundEngine) window.soundEngine.click();
-        if (window.serialManager && window.serialManager.isConnected) {
-          window.serialManager.sendCommand('BACK');
-        }
+        if (window.serialManager && window.serialManager.isConnected) window.serialManager.sendCommand('BACK');
         this.showMenuScreen();
       });
     }
@@ -376,21 +292,13 @@ class ArcadeApp {
     if (this.btnActionStart) {
       this.btnActionStart.addEventListener('click', async () => {
         if (window.soundEngine) window.soundEngine.select();
-        if (!this.selectedGame) {
-          this.logTerminal('Choose a game card first.', 'warn');
-          return;
-        }
+        if (!this.selectedGame) { this.logTerminal('Choose a game card first.', 'warn'); return; }
         if (window.serialManager && window.serialManager.isConnected) {
           this.activeState.textContent = 'STARTING…';
           this.logTerminal(`Sending START:${this.selectedGame} to Arduino…`);
           const sent = await window.serialManager.sendCommand(`START:${this.selectedGame}`);
           if (sent) this.logTerminal('Start command sent. Waiting for Arduino game status…', 'in');
-          else {
-            this.activeState.textContent = 'START FAILED';
-            this.logTerminal('The command could not be written to the serial port.', 'warn');
-          }
-        } else {
-          this.startSimulatedGame();
+          else { this.activeState.textContent = 'START FAILED'; this.logTerminal('The command could not be written to the serial port.', 'warn'); }
         }
       });
     }
@@ -399,11 +307,8 @@ class ArcadeApp {
       this.btnActionPause.addEventListener('click', () => {
         if (window.soundEngine) window.soundEngine.click();
         if (window.serialManager && window.serialManager.isConnected) {
-          if (this.activeState.textContent === 'PAUSED') {
-            window.serialManager.sendCommand('RESUME');
-          } else {
-            window.serialManager.sendCommand('PAUSE');
-          }
+          if (this.activeState.textContent === 'PAUSED') window.serialManager.sendCommand('RESUME');
+          else window.serialManager.sendCommand('PAUSE');
         }
       });
     }
@@ -411,19 +316,13 @@ class ArcadeApp {
     if (this.btnActionRestart) {
       this.btnActionRestart.addEventListener('click', () => {
         if (window.soundEngine) window.soundEngine.select();
-        if (window.serialManager && window.serialManager.isConnected) {
-          window.serialManager.sendCommand('RESTART');
-        } else {
-          this.startSimulatedGame();
-        }
+        if (window.serialManager && window.serialManager.isConnected) window.serialManager.sendCommand('RESTART');
       });
     }
   }
 
   bindSerialEvents() {
-    if (!window.serialManager) {
-      window.serialManager = new SerialManager();
-    }
+    if (!window.serialManager) window.serialManager = new SerialManager();
 
     window.serialManager.onStatusChange = (connected, message) => {
       if (connected) {
@@ -457,11 +356,7 @@ class ArcadeApp {
       } else if (key === 'BEST') {
         if (this.activeBest) this.activeBest.textContent = val;
       } else if (key === 'GAME') {
-        if (val !== 'NONE' && val !== 'MENU') {
-          this.selectedGame = val;
-        }
-      } else if (key === 'MENU') {
-        console.log("Menu selection updated from physical button:", val);
+        if (val !== 'NONE' && val !== 'MENU') this.selectedGame = val;
       } else if (key === 'LCD1') {
         const l1 = document.getElementById('virtual-lcd-line1');
         if (l1) l1.textContent = val;
@@ -473,15 +368,8 @@ class ArcadeApp {
       }
     };
 
-    window.serialManager.onFrame = (frameStr) => {
-      this.renderMatrixFrame(frameStr);
-    };
-
-    window.serialManager.onMessage = (rawLine) => {
-      if (!rawLine.startsWith('FRAME:')) {
-        console.log('Serial <<', rawLine);
-      }
-    };
+    window.serialManager.onFrame = (frameStr) => { this.renderMatrixFrame(frameStr); };
+    window.serialManager.onMessage = (rawLine) => { if (!rawLine.startsWith('FRAME:')) console.log('Serial <<', rawLine); };
   }
 
   openGameView(gameKey) {
@@ -496,24 +384,21 @@ class ArcadeApp {
     if (this.activeBest) this.activeBest.textContent = this.highScores[gameKey] || 0;
     if (this.activeState) this.activeState.textContent = 'READY';
 
-    // NEW: Update the dynamic game guide box
-    const guide = document.getElementById('guideText');
-    if (guide) {
-      guide.innerText = GAME_GUIDES[gameKey] || 'Select a game to see instructions.';
+    // UPDATE THE GAME GUIDE BOX
+    const guideBox = document.getElementById('gameGuide');
+    if (guideBox) {
+      guideBox.innerText = GAME_GUIDES[gameKey] || 'Select a game to view controls.';
     }
 
     if (this.screenMenu) this.screenMenu.classList.remove('active');
     if (this.screenGame) this.screenGame.classList.add('active');
 
     this.logTerminal(`Selected game: ${details.title}`);
-
     this.stopSimulator();
+    
     if (window.serialManager && window.serialManager.isConnected) {
       if (this.activeState) this.activeState.textContent = 'READY — PRESS START';
       this.logTerminal(`Game selected: ${gameKey}. Press START to send it to the Arduino.`);
-    } else {
-      if (this.activeState) this.activeState.textContent = 'SIMULATOR READY';
-      this.logTerminal('Arduino not connected. Press START to preview browser simulator.', 'warn');
     }
   }
 
@@ -525,38 +410,12 @@ class ArcadeApp {
     this.updateCardHighScores();
     
     // Reset guide text when returning to menu
-    const guide = document.getElementById('guideText');
-    if (guide) {
-      guide.innerText = 'Select a game to see instructions.';
-    }
-  }
-
-  startSimulatedGame() {
-    this.stopSimulator();
-    this.isSimulating = true;
-    if (this.activeState) this.activeState.textContent = 'PLAYING (SIM)';
-    if (window.soundEngine) window.soundEngine.gameStart();
-    this.logTerminal('Running visual simulator preview on 5x5 matrix...', 'in');
-
-    let t = 0;
-    this.simFrameTimer = setInterval(() => {
-      t++;
-      let frame = '';
-      for (let r = 0; r < 5; r++) {
-        for (let c = 0; c < 5; c++) {
-          const on = ((r + c + Math.floor(t / 2)) % 3 === 0);
-          frame += on ? '1' : '0';
-        }
-      }
-      this.renderMatrixFrame(frame);
-    }, 100);
+    const guideBox = document.getElementById('gameGuide');
+    if (guideBox) guideBox.innerText = 'Select a game to view controls.';
   }
 
   stopSimulator() {
-    if (this.simFrameTimer) {
-      clearInterval(this.simFrameTimer);
-      this.simFrameTimer = null;
-    }
+    if (this.simFrameTimer) { clearInterval(this.simFrameTimer); this.simFrameTimer = null; }
     this.isSimulating = false;
   }
 }
