@@ -564,17 +564,4 @@ class ArcadeApp {
 window.addEventListener('DOMContentLoaded', () => {
   window.serialManager = new SerialManager();
   window.app = new ArcadeApp();
-});/* --- CLEAN FESTIVAL GAME GUIDE BOX --- */
-.guideBox {
-  padding: 15px;
-  border: 2px solid #00ffff;
-  border-radius: 10px;
-  margin-top: 15px;
-  font-size: 14px;
-  white-space: pre-line;
-  background: rgba(0, 255, 255, 0.05);
-  color: #ffffff;
-  font-family: 'Courier New', Courier, monospace;
-  line-height: 1.6;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.15);
-}
+});
